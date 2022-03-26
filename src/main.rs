@@ -1,8 +1,4 @@
-use std::fmt::Error;
-use std::fmt::Result;
-use std::future::Future;
-
-use tokio::net::{TcpListener, TcpStream};
+use tokio::net::{TcpListener};
 use tokio::io::AsyncWriteExt;
 
 #[tokio::main]
@@ -13,7 +9,7 @@ async fn main() {
     loop {
         // The second item contains the IP and port of the new connection.
         match listener.accept().await{
-            Ok((mut _socket, addr)) =>  _socket.write_all(b"ahah").await.unwrap(),
+            Ok((mut socket, _addr)) =>  socket.write_all(b"ahah2").await.unwrap(),
             Err(e) => println!("couldn't get client: {:?}", e),
         }
     }
