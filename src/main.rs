@@ -13,7 +13,7 @@ async fn main() {
     loop {
         // The second item contains the IP and port of the new connection.
         match listener.accept().await{
-            Ok((mut _socket, addr)) =>  _socket.write_all("{}", addr.ip()).await.unwrap(),
+            Ok((mut _socket, addr)) =>  _socket.write_all(b"ahah").await.unwrap(),
             Err(e) => println!("couldn't get client: {:?}", e),
         }
     }
