@@ -6,7 +6,7 @@ use tokio::io::AsyncWriteExt;
 #[tokio::main]
 async fn main() {
     // Bind the listener to the address
-    let listener = TcpListener::bind("123123:6379").await.unwrap();
+    let listener = TcpListener::bind("0.0.0.0:6379").await.unwrap();
     
     loop {
         // The second item contains the IP and port of the new connection.
@@ -17,11 +17,6 @@ async fn main() {
     }
 }
 
-fn write_address(_addr : SocketAddr) -> String {
-    String::from(format!("{}\n",_addr))
-}
-
-
 fn write_address2(addr : SocketAddr) -> Vec<u8> {
-    format!("{}", addr).into_bytes()
+    format!("{}\n", addr).into_bytes()
 }
