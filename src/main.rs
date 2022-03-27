@@ -1,36 +1,18 @@
-use std::net::SocketAddr;
-
-use tokio::{net::{TcpListener, TcpStream}, io::{AsyncWriteExt, AsyncReadExt}};
+use tokio::net::TcpListener;
 
 #[tokio::main]
-async fn main() {
-    // Bind the listener to the address
+async fn main(){
     let listener = TcpListener::bind("127.0.0.1:6379").await.unwrap();
-    
+
     loop {
-        println!("meh1");
-        // The second item contains the IP and port of the new connection.
-        match listener.accept().await{
-            Ok((stream, addr)) =>  handle(stream, addr).await,
-            Err(e) => println!("couldn't get client: {:?}", e),
+        let a = listener.accept();
+        let b = a.await;
+        match b {
+            Ok(res) => {
+                println!("{:?}", res);
+                println!("new client: {:?}", res.1)
+            }
+            Err(err) => println!("{}", err),
         }
-    }
-}
-
-
-async fn handle(mut stream : TcpStream, addr:  SocketAddr) {
-    stream.write_all(&addr.stocazzoo()).await.unwrap();
-    println!("meh2 {}", stream.read_to_string(&mut String::new()).await.unwrap());
-}
-
-trait ASD{
-    fn stocazzoo(&self) -> Vec<u8>;
-}
-
-
-impl ASD for SocketAddr {
-    fn stocazzoo(&self) -> Vec<u8> {
-        println!("ppp");
-        format!("{:?}\n", self).into_bytes()
     }
 }
