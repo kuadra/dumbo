@@ -23,8 +23,6 @@ async fn handle_connection(listener: TcpListener) {
 }
 
 async fn handle_stream(stream: TcpStream) -> Result<(), Box<dyn Error>> {
-    let stream = TcpStream::connect("127.0.0.1:8080").await?;
-    loop {
         // Wait for the socket to be readable
         stream.readable().await?;
 
@@ -35,17 +33,17 @@ async fn handle_stream(stream: TcpStream) -> Result<(), Box<dyn Error>> {
         // Try to read data, this may still fail with `WouldBlock`
         // if the readiness event is a false positive.
         match stream.try_read(&mut buf) {
-            Ok(0) => break,
+            Ok(0) => println!("1"),
             Ok(n) => {
                 println!("read {} bytes", n);
+                println!("2");
             }
             Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
-                continue;
+                println!("3");
             }
             Err(e) => {
-                return Err(e.into());
+                println!("4");
             }
         }
-    }
     Ok(())
 }
