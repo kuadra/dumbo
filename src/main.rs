@@ -8,16 +8,15 @@ use tokio::{
 async fn main() {
     match TcpListener::bind("127.0.0.1:6379").await {
         Ok(res) => handle_connection(res).await,
-        Err(err) => println!("Binding error"),
+        Err(_) => println!("Binding error"),
     }
 }
 
 async fn handle_connection(listener: TcpListener) {
-    println!("{:?}", listener);
     loop {
         match listener.accept().await {
-            Ok((stream, addr)) => handle_stream(stream).await.unwrap(),
-            Err(err) => println!("Binding error"),
+            Ok((stream, _)) => handle_stream(stream).await.unwrap(),
+            Err(err) => println!("Accept error {:}", err),
         }
     }
 }
@@ -41,7 +40,7 @@ async fn handle_stream(stream: TcpStream) -> Result<(), Box<dyn Error>> {
             Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
                 println!("3");
             }
-            Err(e) => {
+            Err(_) => {
                 println!("4");
             }
         }
