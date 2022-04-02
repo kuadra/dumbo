@@ -1,48 +1,32 @@
-use std::error::Error;
 use tokio::{
-    io,
+    io::AsyncReadExt,
     net::{TcpListener, TcpStream},
 };
 
 #[tokio::main]
 async fn main() {
     match TcpListener::bind("127.0.0.1:6379").await {
-        Ok(res) => handle_connection(res).await,
-        Err(_) => println!("Binding error"),
+        Ok(listener) => handle_connection(listener).await,
+        Err(e) => println!("{}", e),
     }
 }
 
 async fn handle_connection(listener: TcpListener) {
     loop {
         match listener.accept().await {
-            Ok((stream, _)) => handle_stream(stream).await.unwrap(),
-            Err(err) => println!("Accept error {:}", err),
+            Ok((stream, _)) => handle_stream(stream).await,
+            Err(e) => println!("{}", e),
         }
     }
 }
 
-async fn handle_stream(stream: TcpStream) -> Result<(), Box<dyn Error>> {
-        // Wait for the socket to be readable
-        stream.readable().await?;
+async fn handle_stream(mut stream: TcpStream) {
+    let mut buffer = [0; 4096];
 
-        // Creating the buffer **after** the `await` prevents it from
-        // being stored in the async task.
-        let mut buf = [0; 4096];
-
-        // Try to read data, this may still fail with `WouldBlock`
-        // if the readiness event is a false positive.
-        match stream.try_read(&mut buf) {
-            Ok(0) => println!("1"),
-            Ok(n) => {
-                println!("read {} bytes", n);
-                println!("2");
-            }
-            Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
-                println!("3");
-            }
-            Err(_) => {
-                println!("4");
-            }
-        }
-    Ok(())
+    stream.read(&mut buffer).await.unwrap();
+    let data = match std::str::from_utf8(&buffer[0..4096]) {
+        Ok(data) => data,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+    println!("{}", data);
 }
