@@ -1,32 +1,29 @@
-use tokio::{
-    io::AsyncReadExt,
-    net::{TcpListener, TcpStream},
-};
+use tokio::{net::{TcpListener, TcpStream}, io::AsyncReadExt};
+
 
 #[tokio::main]
-async fn main() {
-    match TcpListener::bind("127.0.0.1:6379").await {
-        Ok(listener) => handle_connection(listener).await,
-        Err(e) => println!("{}", e),
-    }
-}
+async fn main(){
+    let listener = TcpListener::bind("127.0.0.1:6379").await.unwrap();
 
-async fn handle_connection(listener: TcpListener) {
     loop {
-        match listener.accept().await {
-            Ok((stream, _)) => handle_stream(stream).await,
-            Err(e) => println!("{}", e),
+        println!("===LOOP===");        
+        let a = listener.accept();
+        let b = a.await;
+        match b {
+            Ok(res) => {
+                //println!("{:?}", res.0);
+                println!("New client: {:?}", res.1);
+                handle(res.0).await;
+                res.0.writable().await;
+                res.0.try_write(b"asd");
+            }
+            Err(err) => println!("{}", err),
         }
     }
 }
 
-async fn handle_stream(mut stream: TcpStream) {
-    let mut buffer = [0; 4096];
-
-    stream.read(&mut buffer).await.unwrap();
-    let data = match std::str::from_utf8(&buffer[0..4096]) {
-        Ok(data) => data,
-        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-    };
-    println!("{}", data);
+async fn handle(mut stream : TcpStream) {
+    let a = &mut String::new();
+    stream.read_to_string(a).await.unwrap();
+    println!("{}",a);
 }
