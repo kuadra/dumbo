@@ -12,5 +12,4 @@ impl Buffo {
     pub fn get_mem(&mut self) -> &mut [u8] {
         &mut self.mem
     }
-
 }
