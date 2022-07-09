@@ -3,11 +3,6 @@ pub struct Buffo{
 }
 
 impl Buffo {
-    pub fn ppp(mut self) -> Buffo{
-        println!("PPP {}", self.mem[1]);
-        return self;
-    }
-
     pub fn new() -> Buffo {
         Buffo {
             mem : [0;10]
