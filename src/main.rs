@@ -1,7 +1,6 @@
 mod buffo;
 
-use tokio::{net::{TcpListener, TcpStream}, io::AsyncReadExt};
-
+use tokio::net::{TcpListener, TcpStream};
 
 #[tokio::main]
 async fn main() {
