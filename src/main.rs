@@ -1,5 +1,4 @@
 mod buffo;
-
 use tokio::net::{TcpListener, TcpStream};
 
 #[tokio::main]
@@ -9,12 +8,11 @@ async fn main() {
 
     loop {
         println!("===LOOP===");
-        let a = listener.accept();
-        let b = a.await;
-        match b {
-            Ok(res) => {
-                println!("New client: {:?}", res.1);
-                handle(res.0).await;
+        let connection = listener.accept().await;
+        match connection {
+            Ok((stream, addr)) => {
+                println!("New client: {:?}", addr);
+                handle(stream).await;
             }
             Err(err) => println!("{}", err),
         }
@@ -23,7 +21,7 @@ async fn main() {
 
 async fn handle(stream: TcpStream) {
     stream.readable().await.unwrap();
-    let mut buf : buffo::Buffo = buffo::Buffo::new();
+    let mut buf= buffo::Buffo::new();
     match stream.try_read(buf.get_mem()) {
         Ok(n) => println!("Read {} bytes", n),
         Err(e) => println!("Error: {:?}", e),
