@@ -10,9 +10,10 @@ async fn main() {
     let listener = bound.await.unwrap();
     let buffer = Buffo::new();
 
+    //buffer_scrittura
     wait_for_data(listener, buffer).await.unwrap();
     
-    //crunch_data()
+    //scrivi data(buffer scrittura)
 }
 
 async fn wait_for_data(listener: TcpListener, buffer: Buffo) -> Result<String> {
@@ -22,7 +23,7 @@ async fn wait_for_data(listener: TcpListener, buffer: Buffo) -> Result<String> {
         match connection {
             Ok((stream, addr)) => {
                 println!("New client: {:?}", addr);
-                handle(stream, buffer).await;
+                handle(stream, buffer);
                 return Ok("Appost".to_string());
             }
             Err(err) => return Err(err),
