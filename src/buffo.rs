@@ -12,4 +12,9 @@ impl Buffo {
     pub fn get_mem(&mut self) -> &mut [u8] {
         &mut self.mem
     }
+
+    pub fn put_mem(&mut self, data : u8) -> u8 {
+        self.mem[0] = data;
+        return 1;
+    }
 }
