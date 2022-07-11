@@ -22,7 +22,7 @@ async fn main() {
     }
 }
 
-async fn handle(mut stream: TcpStream, mut buffer: Buffo) -> Buffo{
+async fn handle(mut stream: TcpStream, mut buffer: Buffo) {
     stream.readable().await.unwrap();
     match stream.try_read(buffer.get_mem()) {
         Ok(n) => {
@@ -39,5 +39,4 @@ async fn handle(mut stream: TcpStream, mut buffer: Buffo) -> Buffo{
     println!("STREAM FLUSHED");
     tokio::time::sleep(std::time::Duration::from_millis(5000)).await;
     println!("Buffer A: {:?}", String::from_utf8(buffer.get_mem().to_vec()));
-    buffer
 }
