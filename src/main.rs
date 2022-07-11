@@ -1,8 +1,8 @@
 mod buffo;
 use std::io::Result;
 
-use buffo::Buffo;
-use tokio::net::{TcpListener, TcpStream};
+use tokio::{net::{TcpListener, TcpStream}, io::{AsyncReadExt, AsyncWriteExt}};
+
 
 #[tokio::main]
 async fn main() {
@@ -23,15 +23,16 @@ async fn wait_for_data(listener: TcpListener, buffer: Buffo) -> Result<String> {
         match connection {
             Ok((stream, addr)) => {
                 println!("New client: {:?}", addr);
-                handle(stream, buffer);
-                return Ok("Appost".to_string());
+                tokio::spawn(async move {
+                    handle(stream).await;
+                });
             }
             Err(err) => return Err(err),
         }
     }
 }
 
-async fn handle(stream: TcpStream, mut buffer : Buffo) -> u8 {
+async fn handle(mut stream: TcpStream) {
     stream.readable().await.unwrap();
     match stream.try_read(buffer.get_mem()) {
         Ok(n) => {
@@ -44,4 +45,11 @@ async fn handle(stream: TcpStream, mut buffer : Buffo) -> u8 {
             return 0;
         }
     }
+
+    let response = format!("OK!");
+    stream.write(response.as_bytes()).await.unwrap();
+    stream.flush().await.unwrap();
+    println!("STREAM FLUSHED");
+    tokio::time::sleep(std::time::Duration::from_millis(5000)).await;
+    println!("Buffer A: {:?}", String::from_utf8(buf.get_mem().to_vec()));
 }
